@@ -25,10 +25,23 @@ app.get("/api/hello", function (req, res) {
 
 //Get timestamp and UTC String for a date
 app.get("/api/:date?", function (req, res) {
-  const date = req.params.date;
-  const timeStamp = new Date(date).getTime();
-  const utcString = new Date(date).toUTCString();
-  res.json({ unix: timeStamp, utc: utcString });
+  let date = req.params.date;
+  if (req.params.date === undefined) {
+    date = new Date();
+  }
+  let timeStamp = new Date(date).getTime();
+  let utcString = new Date(date).toUTCString();
+
+  if (!timeStamp) {
+    utcString = new Date(date.substring(0, 10) * 1000).toUTCString();
+    timeStamp = Number(date);
+  }
+
+  if (utcString === "Invalid Date") {
+    res.json({ error: utcString });
+  } else {
+    res.json({ unix: timeStamp, utc: utcString });
+  }
 });
 
 // listen for requests :)
